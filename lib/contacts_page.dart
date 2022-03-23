@@ -105,76 +105,88 @@ class _ContactsDialogState extends State<ContactsDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextFormField(
-              initialValue: name,
-              onChanged: (newValue) {
-                name = newValue;
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Name field cannnot be empty';
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  isDense: true,
-                  contentPadding: EdgeInsets.all(8),
-                  hintText: 'Name'),
-            ),
+            _buildNameField(),
             SizedBox(
               height: 10,
             ),
-            TextFormField(
-              initialValue: phoneNumber,
-              onChanged: (newValue) {
-                phoneNumber = newValue;
-              },
-              validator: (value) {
-                if (value == null ||
-                    int.tryParse(value) == null ||
-                    value.length < 11 ||
-                    value.length > 11) {
-                  return 'Invalid phone number!';
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  isDense: true,
-                  contentPadding: EdgeInsets.all(8),
-                  hintText: 'Phone number'),
-            ),
+            _buildNumberField(),
             SizedBox(
               height: 10,
             ),
           ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () {
-            var isValid = _formKey.currentState!.validate();
-            if (isValid) {
-              var contact = Contact()
-                ..name = name!
-                ..phoneNumnber = phoneNumber!;
-              Navigator.pop(context, contact);
-            }
-          },
-          child: Text(widget.isEditing ? 'Save' : 'Add'),
-        ),
-      ],
+      actions: _buildButtons(context),
     );
+  }
+
+  List<Widget> _buildButtons(BuildContext context) {
+    return [
+      TextButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        child: Text('Cancel'),
+      ),
+      TextButton(
+        onPressed: () {
+          var isValid = _formKey.currentState!.validate();
+          if (isValid) {
+            var contact = Contact()
+              ..name = name!
+              ..phoneNumnber = phoneNumber!;
+            Navigator.pop(context, contact);
+          }
+        },
+        child: Text(widget.isEditing ? 'Save' : 'Add'),
+      ),
+    ];
+  }
+
+  TextFormField _buildNumberField() {
+    return TextFormField(
+            initialValue: phoneNumber,
+            onChanged: (newValue) {
+              phoneNumber = newValue;
+            },
+            validator: (value) {
+              if (value == null ||
+                  int.tryParse(value) == null ||
+                  value.length < 11 ||
+                  value.length > 11) {
+                return 'Invalid phone number!';
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                isDense: true,
+                contentPadding: EdgeInsets.all(8),
+                hintText: 'Phone number'),
+          );
+  }
+
+  TextFormField _buildNameField() {
+    return TextFormField(
+            initialValue: name,
+            onChanged: (newValue) {
+              name = newValue;
+            },
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Name field cannnot be empty';
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                isDense: true,
+                contentPadding: EdgeInsets.all(8),
+                hintText: 'Name'),
+          );
   }
 }
