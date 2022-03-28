@@ -21,18 +21,16 @@ class _ContactsPageState extends State<ContactsPage> {
       body: ListView.builder(
         itemCount: _contacts.length,
         itemBuilder: (context, index) {
-          return ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.blue,
-              child: Text(_contacts[index].name.substring(0, 2).toUpperCase()),
-            ),
-            title: Text(_contacts[index].name),
-            subtitle: Text(_contacts[index].phoneNumnber),
+          return ContactTile(
+            contact: _contacts[index],
             onLongPress: () async {
               Contact? contact = await showDialog(
                   context: context,
                   builder: (context) {
-                    return ContactsDialog(contact: _contacts[index], isEditing: true,);
+                    return ContactsDialog(
+                      contact: _contacts[index],
+                      isEditing: true,
+                    );
                   });
               setState(() {
                 if (contact != null) {
@@ -41,18 +39,11 @@ class _ContactsPageState extends State<ContactsPage> {
                 }
               });
             },
-            trailing: IconButton(
-              onPressed: () {
-                setState(() {
-                  _contacts.removeAt(index);
-                });
-              },
-              icon: Icon(
-                Icons.delete,
-                size: 20,
-                color: Colors.red,
-              ),
-            ),
+            onDeletePressed: () {
+              setState(() {
+                _contacts.removeAt(index);
+              });
+            },
           );
         },
       ),
@@ -68,6 +59,38 @@ class _ContactsPageState extends State<ContactsPage> {
           });
         },
         child: Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+class ContactTile extends StatelessWidget {
+  final Contact contact;
+  final Function() onLongPress;
+  final Function() onDeletePressed;
+
+  ContactTile(
+      {required this.contact,
+      required this.onLongPress,
+      required this.onDeletePressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: Colors.blue,
+        child: Text(contact.name.substring(0, 2).toUpperCase()),
+      ),
+      title: Text(contact.name),
+      subtitle: Text(contact.phoneNumnber),
+      onLongPress: onLongPress,
+      trailing: IconButton(
+        onPressed: onDeletePressed,
+        icon: Icon(
+          Icons.delete,
+          size: 20,
+          color: Colors.red,
+        ),
       ),
     );
   }
@@ -145,48 +168,50 @@ class _ContactsDialogState extends State<ContactsDialog> {
 
   TextFormField _buildNumberField() {
     return TextFormField(
-            initialValue: phoneNumber,
-            onChanged: (newValue) {
-              phoneNumber = newValue;
-            },
-            validator: (value) {
-              if (value == null ||
-                  int.tryParse(value) == null ||
-                  value.length < 11 ||
-                  value.length > 11) {
-                return 'Invalid phone number!';
-              }
-              return null;
-            },
-            decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                isDense: true,
-                contentPadding: EdgeInsets.all(8),
-                hintText: 'Phone number'),
-          );
+      initialValue: phoneNumber,
+      onChanged: (newValue) {
+        phoneNumber = newValue;
+      },
+      validator: (value) {
+        if (value == null ||
+            int.tryParse(value) == null ||
+            value.length < 11 ||
+            value.length > 11) {
+          return 'Invalid phone number!';
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(5),
+          ),
+          isDense: true,
+          contentPadding: EdgeInsets.all(8),
+          hintText: 'Phone number'),
+    );
   }
 
   TextFormField _buildNameField() {
     return TextFormField(
-            initialValue: name,
-            onChanged: (newValue) {
-              name = newValue;
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Name field cannnot be empty';
-              }
-              return null;
-            },
-            decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                isDense: true,
-                contentPadding: EdgeInsets.all(8),
-                hintText: 'Name'),
-          );
+      initialValue: name,
+      onChanged: (newValue) {
+        name = newValue;
+      },
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Name field cannnot be empty';
+        } else if (value.length < 3) {
+          return 'Name must be greater than 3 characters';
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(5),
+          ),
+          isDense: true,
+          contentPadding: EdgeInsets.all(8),
+          hintText: 'Name'),
+    );
   }
 }
